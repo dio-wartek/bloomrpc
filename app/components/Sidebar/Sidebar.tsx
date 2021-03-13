@@ -134,7 +134,7 @@ export function Sidebar({ protos, onMethodSelected, onProtoUpload, onDeleteAll, 
             if (!profoDefinitions){
               return;
             }
-            
+
             onMethodSelected(profoDefinitions.methodName, profoDefinitions.protodef.services[profoDefinitions.serviceName]);
           }}
           onDoubleClick={async (event, treeNode)=>{
@@ -146,8 +146,8 @@ export function Sidebar({ protos, onMethodSelected, onProtoUpload, onDeleteAll, 
             }
 
             // if the original one table doesn't exist, then ignore it
-            
-       
+
+
             onMethodDoubleClick(profoDefinitions.methodName, profoDefinitions.protodef.services[profoDefinitions.serviceName])
           }}
         >

@@ -1,8 +1,7 @@
 import { remote } from 'electron';
-import { fromFileName, mockRequestMethods, Proto, walkServices } from 'bloomrpc-mock';
+import { fromDescriptorSetFile, mockRequestMethods, Proto, walkServices } from 'wartek-bloomrpc-mock';
 import * as path from "path";
 import { ProtoFile, ProtoService } from './protobuf';
-import { Service } from 'protobufjs';
 
 const commonProtosPath = [
   // @ts-ignore
@@ -21,7 +20,7 @@ export function importProtos(onProtoUploaded: OnProtoUpload, importPaths?: strin
   remote.dialog.showOpenDialog({
     properties: ['openFile', 'multiSelections'],
     filters: [
-      { name: 'Protos', extensions: ['proto'] },
+      { name: 'Protos', extensions: ['bin'] },
     ]
   }, async (filePaths: string[]) => {
     if (!filePaths) {
@@ -39,12 +38,18 @@ export function importProtos(onProtoUploaded: OnProtoUpload, importPaths?: strin
  */
 export async function loadProtos(filePaths: string[], importPaths?: string[], onProtoUploaded?: OnProtoUpload): Promise<ProtoFile[]> {
   try {
-    const protos = await Promise.all(filePaths.map((fileName) =>
-      fromFileName(fileName, [
-        ...(importPaths ? importPaths : []),
-        ...commonProtosPath,
-      ])
-    ));
+    // const protos = await Promise.all(filePaths.map((fileName) =>
+    //   fromFileName(fileName, [
+    //     ...(importPaths ? importPaths : []),
+    //     ...commonProtosPath,
+    //   ])
+    // ));
+
+    console.log(commonProtosPath);
+
+    console.log(filePaths);
+    const loaded = await fromDescriptorSetFile(filePaths[0]);
+    const protos = [loaded];
 
     const protoList = protos.reduce((list: ProtoFile[], proto: Proto) => {
 
@@ -83,7 +88,7 @@ function parseServices(proto: Proto) {
 
   const services: {[key: string]: ProtoService} = {};
 
-  walkServices(proto, (service: Service, _: any, serviceName: string) => {
+  walkServices(proto, (service: any, _: any, serviceName: string) => {
     const mocks = mockRequestMethods(service);
     services[serviceName] = {
       serviceName: serviceName,
